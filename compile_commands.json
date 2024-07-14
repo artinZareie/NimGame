@@ -1,0 +1,17 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/aritn/Documents/Projects/uni/NimGame/headers",
+      "-isystem",
+      "/usr/include/SDL2",
+      "-c",
+      "-o",
+      "CMakeFiles/NimGame.dir/src/main.c.o",
+      "/home/aritn/Documents/Projects/uni/NimGame/src/main.c"
+    ],
+    "directory": "/home/aritn/Documents/Projects/uni/NimGame/build",
+    "file": "/home/aritn/Documents/Projects/uni/NimGame/src/main.c",
+    "output": "/home/aritn/Documents/Projects/uni/NimGame/build/CMakeFiles/NimGame.dir/src/main.c.o"
+  }
+]

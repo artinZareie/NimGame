@@ -23,7 +23,7 @@ struct GameBoard {
 };
 
 typedef enum ControlDirection (*PlayerSelectionFunc)(
-    const struct GameBoard *const board);
+    const struct GameBoard *const board, int staged);
 
 void init(void);
 void ResetGameConfig(struct GameConfig *cfg);
@@ -31,4 +31,7 @@ void ResetGameBoard(struct GameBoard *board, struct GameConfig cfg);
 void GameEngine(struct GameBoard *board, PlayerSelectionFunc player1Sel,
                 PlayerSelectionFunc player2Sel);
 
-enum ControlDirection HumanMoveSelector(const struct GameBoard *const board);
+enum ControlDirection HumanMoveSelector(const struct GameBoard *const board,
+                                        int staged);
+enum ControlDirection ComputerMoveSelector(const struct GameBoard *const board,
+                                           int staged);

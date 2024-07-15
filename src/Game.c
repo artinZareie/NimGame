@@ -1,8 +1,9 @@
 #include "Game.h"
+#include "Computer.h"
 #include "Constants.h"
 #include "Screen.h"
 #include "Utils.h"
-#include <bits/posix2_lim.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <time.h>
 
@@ -15,7 +16,13 @@ void init(void) {
     struct GameBoard gboard;
     ResetGameBoard(&gboard, gameConfig);
 
-    GameEngine(&gboard, HumanMoveSelector, HumanMoveSelector);
+    if (sel == PVPOption) {
+      GameEngine(&gboard, HumanMoveSelector, HumanMoveSelector);
+    } else if (sel == PVCOption) {
+      GameEngine(&gboard, HumanMoveSelector, ComputerMoveSelector);
+    } else if (sel == CVCOption) {
+      GameEngine(&gboard, ComputerMoveSelector, ComputerMoveSelector);
+    }
   }
 }
 
@@ -49,9 +56,7 @@ void ResetGameBoard(struct GameBoard *board, struct GameConfig cfg) {
       board->board[0][i] = 1;
 
     if (!board->singleRow) {
-      board->board[1][i] = rand() % (MAX_PIECES / 2 + 1);
-      if (board->board[1][i] == 0)
-        board->board[1][i] = 1;
+      board->board[1][i] = board->board[0][i];
     }
   }
 }
@@ -67,9 +72,9 @@ void GameEngine(struct GameBoard *board, PlayerSelectionFunc player1Sel,
     GameBoardDrawer(board, stagedDraw);
     printf("Staged Draw: %d\n", stagedDraw);
     if (board->turn == 0)
-      dir = player1Sel(board);
+      dir = player1Sel(board, stagedDraw);
     else
-      dir = player2Sel(board);
+      dir = player2Sel(board, stagedDraw);
 
     if (dir == RightDir) {
       board->activeCol = (board->activeCol + 1) % board->noCols;
@@ -97,6 +102,10 @@ void GameEngine(struct GameBoard *board, PlayerSelectionFunc player1Sel,
     } else {
       board->board[board->activeRow][board->activeCol] -= stagedDraw;
 
+      if (!board->singleRow) {
+        board->board[1][board->activeCol] += stagedDraw;
+      }
+
       if (board->board[board->activeRow][board->activeCol] == 0) {
         noActiveCols--;
       }
@@ -120,16 +129,13 @@ void GameEngine(struct GameBoard *board, PlayerSelectionFunc player1Sel,
         break;
       }
 
-      if (!board->singleRow) {
-        board->board[1][board->activeCol] += stagedDraw;
-      }
-
       board->turn = (board->turn + 1) % 2;
     }
   }
 }
 
-enum ControlDirection HumanMoveSelector(const struct GameBoard *const board) {
+enum ControlDirection HumanMoveSelector(const struct GameBoard *const board,
+                                        int staged) {
   char pressedKey;
 redo_the_input:
   pressedKey = NonCanonicalGetChar();
@@ -156,10 +162,45 @@ redo_the_input:
     break;
 
   case '\n':
+  case '\r':
     return Done;
     break;
 
   default:
     goto redo_the_input;
   }
+}
+
+enum ControlDirection ComputerMoveSelector(const struct GameBoard *const board,
+                                           int staged) {
+  int xsum = CalculateGraundy(board, false);
+  int firstRowStrategy = 0;
+
+  if (!board->singleRow && xsum != 0) {
+    firstRowStrategy = 1;
+  }
+
+  if (board->singleRow) {
+    int opt = findOptimalPileStd(board, xsum);
+
+    CrossPlatformSleep(1);
+
+    if (opt == -1)
+      return Done;
+
+    if (board->activeCol > opt)
+      return RightDir;
+    if (board->activeCol < opt)
+      return LeftDir;
+
+    if (staged < xsum)
+      return IncreaseDraw;
+
+    if (staged > xsum)
+      return DecreaseDraw;
+
+    return Done;
+  }
+
+  return Done;
 }

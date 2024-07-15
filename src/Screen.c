@@ -37,7 +37,7 @@ enum MainMenuSelection MainMenuPrinter(void) {
           NO_MAINMENU_OPTIONS;
     } else if (pressedKey == 's' || pressedKey == 'S') {
       selectedNum = (selectedNum + 1) % NO_MAINMENU_OPTIONS;
-    } else if (pressedKey == '\n') {
+    } else if (is_newline(pressedKey)) {
       break;
     }
   }
@@ -80,7 +80,7 @@ struct GameConfig GameConfiguration(enum MainMenuSelection gameType) {
 
     char pressedKey = NonCanonicalGetChar();
 
-    if (pressedKey == '\n')
+    if (is_newline(pressedKey))
       break;
     else if (pressedKey == 'd' || pressedKey == 'D') {
       cfg.level = min_int(NO_MAX_LEVELS - 1, cfg.level + 1);
@@ -132,7 +132,7 @@ struct GameConfig GameConfiguration(enum MainMenuSelection gameType) {
 
       char pressedKey = NonCanonicalGetChar();
 
-      if (pressedKey == '\n')
+      if (is_newline(pressedKey))
         break;
       else if (pressedKey == 'd' || pressedKey == 'D') {
         cfg.computer1Hardness =
@@ -311,13 +311,13 @@ struct GameConfig GameConfiguration(enum MainMenuSelection gameType) {
 
       char pressedKey = NonCanonicalGetChar();
 
-      if (pressedKey == '\n')
+      if (is_newline(pressedKey))
         break;
       else if (pressedKey == 'd' || pressedKey == 'D') {
-        cfg.computer1Hardness =
+        cfg.computer2Hardness =
             min_int(NO_MAX_HARDNESS - 1, cfg.computer2Hardness + 1);
       } else if (pressedKey == 'a' || pressedKey == 'A') {
-        cfg.computer1Hardness = max_int(0, cfg.computer2Hardness - 1);
+        cfg.computer2Hardness = max_int(0, cfg.computer2Hardness - 1);
       }
     }
   } else {
@@ -382,7 +382,7 @@ struct GameConfig GameConfiguration(enum MainMenuSelection gameType) {
 
       char pressedKey = NonCanonicalGetChar();
 
-      if (pressedKey == '\n')
+      if (is_newline(pressedKey))
         break;
       else if (pressedKey == 'd' || pressedKey == 'D') {
         cfg.computer1Hardness =

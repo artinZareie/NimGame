@@ -181,22 +181,22 @@ enum ControlDirection ComputerMoveSelector(const struct GameBoard *const board,
   }
 
   if (board->singleRow) {
-    int opt = findOptimalPileStd(board, xsum);
+    struct IntPair opt = findOptimalPileStd(board, xsum);
 
     CrossPlatformSleep(1);
 
-    if (opt == -1)
+    if (opt.first == -1)
       return Done;
 
-    if (board->activeCol > opt)
+    if (board->activeCol > opt.first)
       return RightDir;
-    if (board->activeCol < opt)
+    if (board->activeCol < opt.first)
       return LeftDir;
 
-    if (staged < xsum)
+    if (staged < opt.second)
       return IncreaseDraw;
 
-    if (staged > xsum)
+    if (staged > opt.second)
       return DecreaseDraw;
 
     return Done;

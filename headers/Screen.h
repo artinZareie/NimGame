@@ -9,6 +9,7 @@
 #if defined(_WIN32) || defined(__MINGW32__) || defined(__CYGWIN__)
 
 #include <Windows.h>
+#include <conio.h>
 
 #else
 
@@ -21,7 +22,15 @@
 enum MainMenuSelection MainMenuPrinter(void);
 struct GameConfig GameConfiguration(enum MainMenuSelection gameType);
 
+// Game
+void GameBoardDrawer(struct GameBoard *board);
+
+// Game drawer helpers
+void FillScreen(struct GameBoard *board, char screen[SCREEN_HEIGHT][SCREEN_WDITH]);
+void ClearBoardScreen(char screen[SCREEN_HEIGHT][SCREEN_WDITH]);
+
 // Helper functions
 void ClearScreen(void);
 char NonCanonicalGetChar();
 void CorssPlatformSleep(int amount);
+void SetBackgroundColorWhite(char c);

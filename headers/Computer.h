@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Game.h"
+#include "Utils.h"
 
 int CalculateGraundy(const struct GameBoard *board, bool onlyFirst);
-int findOptimalPileStd(const struct GameBoard *board, int xsum);
+struct IntPair findOptimalPileStd(const struct GameBoard *board, int xsum);

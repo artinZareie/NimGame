@@ -50,6 +50,29 @@ const char *const PVC_MESSAGE = "New game: Human vs Computer";
 const char *const CVC_MESSAGE = "New game: Computer vs Computer";
 const char *const LOAD_GAME_MESSAGE = "Load Game from database";
 
+const char *const CONGRATS_MESSAGE = "Congrats! You won";
+
+const char *const FIRST_PLAYER_WON =
+    " _____ _          _     ____  _                        __        __       "
+    "   \n|  ___(_)_ __ ___| |_  |  _ \\| | __ _ _   _  ___ _ __  \\ \\      / "
+    "/__  _ __  \n| |_  | | '__/ __| __| | |_) | |/ _` | | | |/ _ \\ '__|  "
+    "\\ \\ /\\ / / _ \\| '_ \\ \n|  _| | | |  \\__ \\ |_  |  __/| | (_| | |_| "
+    "|  __/ "
+    "|      \\ V  V / (_) | | | |\n|_|   |_|_|  |___/\\__| |_|   "
+    "|_|\\__,_|\\__, "
+    "|\\___|_|       \\_/\\_/ \\___/|_| |_|\n                                  "
+    "    "
+    "|___/                                  ";
+const char *const SECOND_PLAYER_WON =
+    " ____                           _   ____  _                        __     "
+    "   __          \n/ ___|  ___  ___ ___  _ __   __| | |  _ \\| | __ _ _   _ "
+    " ___ _ __  \\ \\      / /__  _ __  \n\\___ \\ / _ \\/ __/ _ \\| '_ \\ / "
+    "_` | | |_) | |/ _` | | | |/ _ \\ '__|  \\ \\ /\\ / / _ \\| '_ \\ \n ___) "
+    "|  __/ (_| (_) | | | | (_| | |  __/| | (_| | |_| |  __/ |      \\ V  V / "
+    "(_) | | | |\n|____/ \\___|\\___\\___/|_| |_|\\__,_| |_|   |_|\\__,_|\\__, "
+    "|\\___|_|       \\_/\\_/ \\___/|_| |_|\n                                  "
+    "                |___/                                  \n";
+
 const size_t NO_MAINMENU_OPTIONS = 5;
 const char *const MainMenuOptionMessages[5] = {
     PVP_MESSAGE, PVF_MESSAGE, PVC_MESSAGE, CVC_MESSAGE, LOAD_GAME_MESSAGE};

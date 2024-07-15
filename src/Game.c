@@ -1,6 +1,8 @@
 #include "Game.h"
 #include "Constants.h"
 #include "Screen.h"
+#include "Utils.h"
+#include <bits/posix2_lim.h>
 #include <stdio.h>
 #include <time.h>
 
@@ -13,7 +15,7 @@ void init(void) {
     struct GameBoard gboard;
     ResetGameBoard(&gboard, gameConfig);
 
-    GameBoardDrawer(&gboard);
+    GameEngine(&gboard, HumanMoveSelector, HumanMoveSelector);
   }
 }
 
@@ -51,5 +53,113 @@ void ResetGameBoard(struct GameBoard *board, struct GameConfig cfg) {
       if (board->board[1][i] == 0)
         board->board[1][i] = 1;
     }
+  }
+}
+
+void GameEngine(struct GameBoard *board, PlayerSelectionFunc player1Sel,
+                PlayerSelectionFunc player2Sel) {
+
+  enum ControlDirection dir = 0;
+  int stagedDraw = 1;
+  int noActiveCols = board->noCols;
+
+  while (true) {
+    GameBoardDrawer(board, stagedDraw);
+    printf("Staged Draw: %d\n", stagedDraw);
+    if (board->turn == 0)
+      dir = player1Sel(board);
+    else
+      dir = player2Sel(board);
+
+    if (dir == RightDir) {
+      board->activeCol = (board->activeCol + 1) % board->noCols;
+
+      while (board->board[board->activeRow][board->activeCol] == 0) {
+        board->activeCol = (board->activeCol + 1) % board->noCols;
+      }
+
+      stagedDraw =
+          min_int(board->board[board->activeRow][board->activeCol], stagedDraw);
+    } else if (dir == LeftDir) {
+      board->activeCol = (board->activeCol - 1 + board->noCols) % board->noCols;
+
+      while (board->board[board->activeRow][board->activeCol] == 0) {
+        board->activeCol =
+            (board->activeCol - 1 + board->noCols) % board->noCols;
+      }
+      stagedDraw =
+          min_int(board->board[board->activeRow][board->activeCol], stagedDraw);
+    } else if (dir == IncreaseDraw) {
+      stagedDraw = min_int(stagedDraw + 1,
+                           board->board[board->activeRow][board->activeCol]);
+    } else if (dir == DecreaseDraw) {
+      stagedDraw = max_int(1, stagedDraw - 1);
+    } else {
+      board->board[board->activeRow][board->activeCol] -= stagedDraw;
+
+      if (board->board[board->activeRow][board->activeCol] == 0) {
+        noActiveCols--;
+      }
+
+      while (noActiveCols > 0 &&
+             board->board[board->activeRow][board->activeCol] == 0) {
+        board->activeCol = (board->activeCol + 1) % board->noCols;
+      }
+
+      if (noActiveCols == 0 && !board->singleRow) {
+        for (int i = 0; i < board->noCols; i++) {
+          board->board[0][i] = board->board[1][i];
+        }
+
+        board->singleRow = true;
+        noActiveCols = board->noCols;
+      }
+
+      if (noActiveCols == 0 && board->singleRow) {
+        WinScreen(board);
+        break;
+      }
+
+      if (!board->singleRow) {
+        board->board[1][board->activeCol] += stagedDraw;
+      }
+
+      board->turn = (board->turn + 1) % 2;
+    }
+  }
+}
+
+enum ControlDirection HumanMoveSelector(const struct GameBoard *const board) {
+  char pressedKey;
+redo_the_input:
+  pressedKey = NonCanonicalGetChar();
+
+  switch (pressedKey) {
+  case 'a':
+  case 'A':
+    return LeftDir;
+    break;
+
+  case 'd':
+  case 'D':
+    return RightDir;
+    break;
+
+  case 'w':
+  case 'W':
+    return DecreaseDraw;
+    break;
+
+  case 's':
+  case 'S':
+    return IncreaseDraw;
+    break;
+
+  case '\n':
+    return Done;
+    break;
+
+  default:
+    goto redo_the_input;
   }
 }

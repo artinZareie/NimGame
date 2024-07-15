@@ -22,12 +22,13 @@ struct GameBoard {
   struct GameConfig cfg;
 };
 
-typedef enum ControlDirection (*PlayerSelectionFunc)(struct GameBoard board);
-typedef size_t (*PlayerDrawAmount)(struct GameBoard board);
+typedef enum ControlDirection (*PlayerSelectionFunc)(
+    const struct GameBoard *const board);
 
 void init(void);
 void ResetGameConfig(struct GameConfig *cfg);
 void ResetGameBoard(struct GameBoard *board, struct GameConfig cfg);
-void GameEngine(struct GameBoard board, PlayerSelectionFunc player1Sel,
-                PlayerSelectionFunc player2Sel, PlayerDrawAmount player1Draw,
-                PlayerDrawAmount player2Draw);
+void GameEngine(struct GameBoard *board, PlayerSelectionFunc player1Sel,
+                PlayerSelectionFunc player2Sel);
+
+enum ControlDirection HumanMoveSelector(const struct GameBoard *const board);

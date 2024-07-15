@@ -43,7 +43,7 @@ enum MainMenuSelection MainMenuPrinter(void) {
   }
 
   printf("\n\n\nNavigating to: %s\n", MainMenuOptionMessages[selectedNum]);
-  CorssPlatformSleep(1);
+  CrossPlatformSleep(1);
 
   return selectedNum;
 }
@@ -396,7 +396,7 @@ struct GameConfig GameConfiguration(enum MainMenuSelection gameType) {
   return cfg;
 }
 
-void GameBoardDrawer(struct GameBoard *board) {
+void GameBoardDrawer(const struct GameBoard *board, int stagedDraw) {
   ClearScreen();
   char screen[SCREEN_HEIGHT][SCREEN_WDITH];
   FillScreen(board, screen);
@@ -406,8 +406,10 @@ void GameBoardDrawer(struct GameBoard *board) {
     for (int i = 0; i < fillableCols; i++) {
       int col = i / (COL_BASE_WIDTH + COL_VERTICAL_MARGIN);
 
+      int height = MAX_PIECES + 1 - j;
       if (0 == board->activeRow && col == board->activeCol &&
-          screen[j][i] == '#') {
+          (screen[j][i] == '#' || screen[j][i] == '^') &&
+          height <= (board->board[0][col] - stagedDraw)) {
         SetBackgroundColorWhite(screen[j][i]);
       } else {
         putchar(screen[j][i]);
@@ -416,23 +418,39 @@ void GameBoardDrawer(struct GameBoard *board) {
     putchar('\n');
   }
 
-  if (board->singleRow)
-    return;
+  if (!board->singleRow) {
+    for (int j = MAX_PIECES + 2; j <= 2 * MAX_PIECES + COL_VERTICAL_MARGIN + 1;
+         j++) {
+      for (int i = 0; i < fillableCols; i++) {
+        int col = i / (COL_BASE_WIDTH + COL_VERTICAL_MARGIN);
 
-  for (int j = MAX_PIECES + 2; j <= 2 * MAX_PIECES + COL_VERTICAL_MARGIN + 1;
-       j++) {
-    for (int i = 0; i < fillableCols; i++) {
-      int col = i / (COL_BASE_WIDTH + COL_VERTICAL_MARGIN);
-
-      if (1 == board->activeRow && col == board->activeCol &&
-          screen[j][i] == '#') {
-        SetBackgroundColorWhite(screen[j][i]);
-      } else {
-        putchar(screen[j][i]);
+        int height = 2 * MAX_PIECES + COL_VERTICAL_MARGIN - j + 1;
+        if (1 == board->activeRow && col == board->activeCol &&
+            (screen[j][i] == '#' || screen[j][i] == '^') &&
+            height <= (board->board[0][col] - stagedDraw)) {
+          SetBackgroundColorWhite(screen[j][i]);
+        } else {
+          putchar(screen[j][i]);
+        }
       }
+      putchar('\n');
     }
-    putchar('\n');
   }
+
+  if (board->turn == 0) {
+    printf("%s's turn (Player 1)\n", board->cfg.player1Name);
+  } else {
+    printf("%s's turn (Player 2)\n", board->cfg.player2Name);
+  }
+}
+
+void WinScreen(const struct GameBoard *board) {
+  ClearScreen();
+
+  printf("%s\n", board->turn == 0 ? FIRST_PLAYER_WON : SECOND_PLAYER_WON);
+
+  printf("%s, %s!\n", CONGRATS_MESSAGE,
+         board->turn == 0 ? board->cfg.player1Name : board->cfg.player2Name);
 }
 
 void ClearBoardScreen(char screen[SCREEN_HEIGHT][SCREEN_WDITH]) {
@@ -443,7 +461,7 @@ void ClearBoardScreen(char screen[SCREEN_HEIGHT][SCREEN_WDITH]) {
   }
 }
 
-void FillScreen(struct GameBoard *board,
+void FillScreen(const struct GameBoard *board,
                 char screen[SCREEN_HEIGHT][SCREEN_WDITH]) {
   int fillableCols = board->noCols * (COL_BASE_WIDTH + COL_HORIZONTAL_MARGIN);
   ClearBoardScreen(screen);
@@ -528,7 +546,7 @@ void ClearScreen(void) { system(CLEAN_COMMAND); }
 #if defined(_WIN32) || defined(__MINGW32__) || defined(__CYGWIN__)
 
 char NonCanonicalGetChar(void) { return getch(); }
-void CorssPlatformSleep(int amount) { Sleep(amount); }
+void CrossPlatformSleep(int amount) { Sleep(amount); }
 void SetBackgroundColorWhite(char c) {
   HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
   CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
@@ -573,7 +591,7 @@ char NonCanonicalGetChar(void) {
   return buf;
 }
 
-void CorssPlatformSleep(int amount) { sleep(amount); }
+void CrossPlatformSleep(int amount) { sleep(amount); }
 
 void SetBackgroundColorWhite(char c) { printf("\033[47;30m%c\033[0m", c); }
 

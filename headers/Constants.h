@@ -34,9 +34,14 @@ extern const char *const PVC_MESSAGE;
 extern const char *const CVC_MESSAGE;
 extern const char *const LOAD_GAME_MESSAGE;
 
+extern const char *const CONGRATS_MESSAGE;
+
 extern const char *const MENU_SELECTOR;
 
 extern const char *const CLEAN_COMMAND;
+
+extern const char *const FIRST_PLAYER_WON;
+extern const char *const SECOND_PLAYER_WON;
 
 // Enums
 enum MainMenuSelection {
@@ -47,7 +52,15 @@ enum MainMenuSelection {
   LoadGameOption
 };
 
-enum ControlDirection { UpDir, LeftDir, DownDir, RightDir, Done };
+enum ControlDirection {
+  UpDir,
+  LeftDir,
+  DownDir,
+  RightDir,
+  IncreaseDraw,
+  DecreaseDraw,
+  Done
+};
 
 extern const size_t NO_MAINMENU_OPTIONS;
 extern const char *const MainMenuOptionMessages[5];

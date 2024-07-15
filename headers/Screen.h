@@ -23,14 +23,16 @@ enum MainMenuSelection MainMenuPrinter(void);
 struct GameConfig GameConfiguration(enum MainMenuSelection gameType);
 
 // Game
-void GameBoardDrawer(struct GameBoard *board);
+void GameBoardDrawer(const struct GameBoard *board, int stagedDraw);
+void WinScreen(const struct GameBoard *board);
 
 // Game drawer helpers
-void FillScreen(struct GameBoard *board, char screen[SCREEN_HEIGHT][SCREEN_WDITH]);
+void FillScreen(const struct GameBoard *board,
+                char screen[SCREEN_HEIGHT][SCREEN_WDITH]);
 void ClearBoardScreen(char screen[SCREEN_HEIGHT][SCREEN_WDITH]);
 
 // Helper functions
 void ClearScreen(void);
 char NonCanonicalGetChar();
-void CorssPlatformSleep(int amount);
+void CrossPlatformSleep(int amount);
 void SetBackgroundColorWhite(char c);

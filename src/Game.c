@@ -130,6 +130,7 @@ void GameEngine(struct GameBoard *board, PlayerSelectionFunc player1Sel,
       }
 
       board->turn = (board->turn + 1) % 2;
+      stagedDraw = 1;
     }
   }
 }
@@ -175,23 +176,65 @@ enum ControlDirection ComputerMoveSelector(const struct GameBoard *const board,
                                            int staged) {
   int xsum = CalculateGraundy(board, false);
   int firstRowStrategy = 0;
+  int moveRandomness =
+      NO_MAX_HARDNESS - (board->turn == 0 ? board->cfg.computer1Hardness
+                                          : board->cfg.computer2Hardness);
+  int correctMove = (rand() % moveRandomness) == 0;
+  if (moveRandomness == 1)
+    correctMove = 1;
 
   if (!board->singleRow && xsum != 0) {
     firstRowStrategy = 1;
   }
 
-  if (board->singleRow) {
+  if (firstRowStrategy == 0 || !board->singleRow) {
     struct IntPair opt = findOptimalPileStd(board, xsum);
+
+    if (!correctMove) {
+      for (int i = 0; i < board->noCols; i++) {
+        if (i != opt.first && board->board[0][i] != 0) {
+          opt.first = i;
+          opt.second = 1;
+        } else if (i == opt.first && board->board[0][i] != 1) {
+          if (opt.second == 1)
+            opt.second = 2;
+          else
+            opt.second = 1;
+        }
+      }
+    }
 
     CrossPlatformSleep(1);
 
-    if (opt.first == -1)
+    if (opt.first == -1 || opt.second == -1)
       return Done;
 
     if (board->activeCol > opt.first)
-      return RightDir;
-    if (board->activeCol < opt.first)
       return LeftDir;
+    if (board->activeCol < opt.first)
+      return RightDir;
+
+    if (staged < opt.second)
+      return IncreaseDraw;
+
+    if (staged > opt.second)
+      return DecreaseDraw;
+
+    return Done;
+  }
+
+  if (firstRowStrategy == 1) {
+    struct IntPair opt = findOptimalPileMisere(board, xsum);
+
+    CrossPlatformSleep(1);
+
+    if (opt.first == -1 || opt.second == -1)
+      return Done;
+
+    if (board->activeCol > opt.first)
+      return LeftDir;
+    if (board->activeCol < opt.first)
+      return RightDir;
 
     if (staged < opt.second)
       return IncreaseDraw;

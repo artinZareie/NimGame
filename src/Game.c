@@ -14,14 +14,31 @@ void init(void) {
   if (sel != LoadGameOption) {
     struct GameConfig gameConfig = GameConfiguration(sel);
     struct GameBoard gboard;
+    struct FramesHistory gameFrames;
     ResetGameBoard(&gboard, gameConfig);
 
     if (sel == PVPOption) {
-      GameEngine(&gboard, HumanMoveSelector, HumanMoveSelector);
+      gameFrames = GameEngine(&gboard, HumanMoveSelector, HumanMoveSelector);
     } else if (sel == PVCOption) {
-      GameEngine(&gboard, HumanMoveSelector, ComputerMoveSelector);
+      gameFrames = GameEngine(&gboard, HumanMoveSelector, ComputerMoveSelector);
     } else if (sel == CVCOption) {
-      GameEngine(&gboard, ComputerMoveSelector, ComputerMoveSelector);
+      gameFrames =
+          GameEngine(&gboard, ComputerMoveSelector, ComputerMoveSelector);
+    }
+
+    bool saveTheGame = WinScreen(&gboard);
+
+    if (saveTheGame) {
+      FILE *fd = fopen("LastGame.txt", "w+");
+
+      fprintf(fd, "%d %d %lu\n", gameFrames.noFrames, gameFrames.cfg.gameType,
+              gameFrames.cfg.level);
+      fprintf(fd, "%s %s\n", gameFrames.cfg.player1Name,
+              gameFrames.cfg.player2Name);
+      fprintf(fd, "%lu %lu\n", gameFrames.cfg.computer1Hardness,
+              gameFrames.cfg.computer2Hardness);
+
+      fclose(fd);
     }
   }
 }
@@ -61,12 +78,76 @@ void ResetGameBoard(struct GameBoard *board, struct GameConfig cfg) {
   }
 }
 
-void GameEngine(struct GameBoard *board, PlayerSelectionFunc player1Sel,
-                PlayerSelectionFunc player2Sel) {
+void ResetFrameHistory(struct FramesHistory *frames, struct GameFrame initial) {
+  frames->head = malloc(sizeof(struct GameFrame));
 
+  for (int i = 0; i < 2; i++) {
+    if (initial.board[i] == NULL) {
+      frames->head->board[i] = NULL;
+      continue;
+    }
+
+    frames->head->board[i] = malloc((initial.noCols) * sizeof(int));
+    for (int j = 0; j < initial.noCols; j++) {
+      frames->head->board[i][j] = initial.board[i][j];
+    }
+  }
+
+  frames->head->singleRow = initial.singleRow;
+  frames->head->next = NULL;
+  frames->tail = frames->head;
+  frames->noFrames = 1;
+}
+
+void AddFrame(const struct GameBoard *board, struct FramesHistory *frames) {
+  struct GameFrame *newFrame = malloc(sizeof(struct GameFrame));
+  newFrame->noCols = board->noCols;
+  newFrame->singleRow = board->singleRow;
+  newFrame->turn = board->turn;
+
+  for (int i = 0; i < 2; i++) {
+    if (board->board[i] == NULL) {
+      newFrame->board[i] = NULL;
+      continue;
+    }
+
+    newFrame->board[i] = malloc((board->noCols) * sizeof(int));
+    for (int j = 0; j < board->noCols; j++) {
+      newFrame->board[i][j] = board->board[i][j];
+    }
+  }
+
+  frames->tail->next = newFrame;
+  frames->tail = newFrame;
+  frames->noFrames++;
+}
+
+struct FramesHistory GameEngine(struct GameBoard *board,
+                                PlayerSelectionFunc player1Sel,
+                                PlayerSelectionFunc player2Sel) {
   enum ControlDirection dir = 0;
   int stagedDraw = 1;
   int noActiveCols = board->noCols;
+
+  struct FramesHistory fhist;
+  struct GameFrame init;
+  init.singleRow = board->singleRow;
+  init.noCols = board->noCols;
+  init.turn = board->turn;
+  fhist.cfg = board->cfg;
+
+  for (int i = 0; i < 2; i++) {
+    if (board->board[i] == NULL) {
+      init.board[i] = NULL;
+      continue;
+    }
+
+    init.board[i] = malloc((board->noCols) * sizeof(int));
+    for (int j = 0; j < board->noCols; j++) {
+      init.board[i][j] = board->board[i][j];
+    }
+  }
+  ResetFrameHistory(&fhist, init);
 
   while (true) {
     GameBoardDrawer(board, stagedDraw);
@@ -125,14 +206,15 @@ void GameEngine(struct GameBoard *board, PlayerSelectionFunc player1Sel,
       }
 
       if (noActiveCols == 0 && board->singleRow) {
-        WinScreen(board);
-        break;
+        return fhist;
       }
 
       board->turn = (board->turn + 1) % 2;
       stagedDraw = 1;
     }
   }
+
+  return fhist;
 }
 
 enum ControlDirection HumanMoveSelector(const struct GameBoard *const board,
@@ -183,28 +265,17 @@ enum ControlDirection ComputerMoveSelector(const struct GameBoard *const board,
   if (moveRandomness == 1)
     correctMove = 1;
 
+  CrossPlatformSleep(1);
+
+  if (!correctMove)
+    return Done;
+
   if (!board->singleRow && xsum != 0) {
     firstRowStrategy = 1;
   }
 
   if (firstRowStrategy == 0 || !board->singleRow) {
     struct IntPair opt = findOptimalPileStd(board, xsum);
-
-    if (!correctMove) {
-      for (int i = 0; i < board->noCols; i++) {
-        if (i != opt.first && board->board[0][i] != 0) {
-          opt.first = i;
-          opt.second = 1;
-        } else if (i == opt.first && board->board[0][i] != 1) {
-          if (opt.second == 1)
-            opt.second = 2;
-          else
-            opt.second = 1;
-        }
-      }
-    }
-
-    CrossPlatformSleep(1);
 
     if (opt.first == -1 || opt.second == -1)
       return Done;
@@ -225,8 +296,6 @@ enum ControlDirection ComputerMoveSelector(const struct GameBoard *const board,
 
   if (firstRowStrategy == 1) {
     struct IntPair opt = findOptimalPileMisere(board, xsum);
-
-    CrossPlatformSleep(1);
 
     if (opt.first == -1 || opt.second == -1)
       return Done;

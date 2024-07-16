@@ -24,7 +24,7 @@ struct GameConfig GameConfiguration(enum MainMenuSelection gameType);
 
 // Game
 void GameBoardDrawer(const struct GameBoard *board, int stagedDraw);
-void WinScreen(const struct GameBoard *board);
+bool WinScreen(const struct GameBoard *board);
 
 // Game drawer helpers
 void FillScreen(const struct GameBoard *board,

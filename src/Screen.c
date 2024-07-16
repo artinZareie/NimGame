@@ -385,10 +385,10 @@ struct GameConfig GameConfiguration(enum MainMenuSelection gameType) {
       if (is_newline(pressedKey))
         break;
       else if (pressedKey == 'd' || pressedKey == 'D') {
-        cfg.computer1Hardness =
+        cfg.computer2Hardness =
             min_int(NO_MAX_HARDNESS - 1, cfg.computer2Hardness + 1);
       } else if (pressedKey == 'a' || pressedKey == 'A') {
-        cfg.computer1Hardness = max_int(0, cfg.computer2Hardness - 1);
+        cfg.computer2Hardness = max_int(0, cfg.computer2Hardness - 1);
       }
     }
   }
@@ -444,13 +444,23 @@ void GameBoardDrawer(const struct GameBoard *board, int stagedDraw) {
   }
 }
 
-void WinScreen(const struct GameBoard *board) {
+bool WinScreen(const struct GameBoard *board) {
   ClearScreen();
 
   printf("%s\n", board->turn == 0 ? FIRST_PLAYER_WON : SECOND_PLAYER_WON);
 
   printf("%s, %s!\n", CONGRATS_MESSAGE,
          board->turn == 0 ? board->cfg.player1Name : board->cfg.player2Name);
+
+  printf("Do you want to save this game? (y/N)");
+
+  char ans = NonCanonicalGetChar();
+
+  if (ans == 'y' || ans == 'Y') {
+    return true;
+  }
+
+  return false;
 }
 
 void ClearBoardScreen(char screen[SCREEN_HEIGHT][SCREEN_WDITH]) {

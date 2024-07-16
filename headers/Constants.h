@@ -77,3 +77,6 @@ extern const int COL_WIDTH;
 extern const int COL_BASE_WIDTH;
 extern const int COL_HORIZONTAL_MARGIN;
 extern const int COL_VERTICAL_MARGIN;
+
+extern const int MAX_DRAW;
+extern const int MAX_MEX;

@@ -19,26 +19,26 @@ void init(void) {
 
     if (sel == PVPOption) {
       gameFrames = GameEngine(&gboard, HumanMoveSelector, HumanMoveSelector);
+      bool saveTheGame = WinScreen(&gboard);
+
+      if (saveTheGame) {
+        saveGame(&gameFrames);
+      }
     } else if (sel == PVCOption) {
       gameFrames = GameEngine(&gboard, HumanMoveSelector, ComputerMoveSelector);
+      bool saveTheGame = WinScreen(&gboard);
+
+      if (saveTheGame) {
+        saveGame(&gameFrames);
+      }
     } else if (sel == CVCOption) {
       gameFrames =
           GameEngine(&gboard, ComputerMoveSelector, ComputerMoveSelector);
-    }
+      bool saveTheGame = WinScreen(&gboard);
 
-    bool saveTheGame = WinScreen(&gboard);
-
-    if (saveTheGame) {
-      FILE *fd = fopen("LastGame.txt", "w+");
-
-      fprintf(fd, "%d %d %lu\n", gameFrames.noFrames, gameFrames.cfg.gameType,
-              gameFrames.cfg.level);
-      fprintf(fd, "%s %s\n", gameFrames.cfg.player1Name,
-              gameFrames.cfg.player2Name);
-      fprintf(fd, "%lu %lu\n", gameFrames.cfg.computer1Hardness,
-              gameFrames.cfg.computer2Hardness);
-
-      fclose(fd);
+      if (saveTheGame) {
+        saveGame(&gameFrames);
+      }
     }
   }
 }
@@ -148,6 +148,7 @@ struct FramesHistory GameEngine(struct GameBoard *board,
     }
   }
   ResetFrameHistory(&fhist, init);
+  AddFrame(board, &fhist);
 
   while (true) {
     GameBoardDrawer(board, stagedDraw);
@@ -164,8 +165,8 @@ struct FramesHistory GameEngine(struct GameBoard *board,
         board->activeCol = (board->activeCol + 1) % board->noCols;
       }
 
-      stagedDraw =
-          min_int(board->board[board->activeRow][board->activeCol], stagedDraw);
+      stagedDraw = min_int(board->board[board->activeRow][board->activeCol],
+                           min_int(MAX_DRAW, stagedDraw));
     } else if (dir == LeftDir) {
       board->activeCol = (board->activeCol - 1 + board->noCols) % board->noCols;
 
@@ -173,13 +174,13 @@ struct FramesHistory GameEngine(struct GameBoard *board,
         board->activeCol =
             (board->activeCol - 1 + board->noCols) % board->noCols;
       }
-      stagedDraw =
-          min_int(board->board[board->activeRow][board->activeCol], stagedDraw);
+      stagedDraw = min_int(board->board[board->activeRow][board->activeCol],
+                           min_int(MAX_DRAW, stagedDraw));
     } else if (dir == IncreaseDraw) {
-      stagedDraw = min_int(stagedDraw + 1,
+      stagedDraw = min_int(min_int(MAX_DRAW, stagedDraw + 1),
                            board->board[board->activeRow][board->activeCol]);
     } else if (dir == DecreaseDraw) {
-      stagedDraw = max_int(1, stagedDraw - 1);
+      stagedDraw = min_int(MAX_DRAW, max_int(1, stagedDraw - 1));
     } else {
       board->board[board->activeRow][board->activeCol] -= stagedDraw;
 
@@ -211,6 +212,7 @@ struct FramesHistory GameEngine(struct GameBoard *board,
 
       board->turn = (board->turn + 1) % 2;
       stagedDraw = 1;
+      AddFrame(board, &fhist);
     }
   }
 
@@ -257,6 +259,7 @@ redo_the_input:
 enum ControlDirection ComputerMoveSelector(const struct GameBoard *const board,
                                            int staged) {
   int xsum = CalculateGraundy(board, false);
+  int firstRowXsum = CalculateGraundy(board, true);
   int firstRowStrategy = 0;
   int moveRandomness =
       NO_MAX_HARDNESS - (board->turn == 0 ? board->cfg.computer1Hardness
@@ -275,7 +278,7 @@ enum ControlDirection ComputerMoveSelector(const struct GameBoard *const board,
   }
 
   if (firstRowStrategy == 0 || !board->singleRow) {
-    struct IntPair opt = findOptimalPileStd(board, xsum);
+    struct IntPair opt = findOptimalPileStd(board, firstRowXsum);
 
     if (opt.first == -1 || opt.second == -1)
       return Done;
@@ -295,7 +298,7 @@ enum ControlDirection ComputerMoveSelector(const struct GameBoard *const board,
   }
 
   if (firstRowStrategy == 1) {
-    struct IntPair opt = findOptimalPileMisere(board, xsum);
+    struct IntPair opt = findOptimalPileMisere(board, firstRowXsum);
 
     if (opt.first == -1 || opt.second == -1)
       return Done;
@@ -316,3 +319,38 @@ enum ControlDirection ComputerMoveSelector(const struct GameBoard *const board,
 
   return Done;
 }
+
+void saveGame(const struct FramesHistory *gameFrames) {
+  FILE *fd = fopen("LastGame.txt", "w+");
+
+  fprintf(fd, "%d %d %lu\n", gameFrames->noFrames, gameFrames->cfg.gameType,
+          gameFrames->cfg.level);
+  fprintf(fd, "%s\n%s\n", gameFrames->cfg.player1Name,
+          gameFrames->cfg.player2Name);
+  fprintf(fd, "%lu %lu\n\n", gameFrames->cfg.computer1Hardness,
+          gameFrames->cfg.computer2Hardness);
+
+  struct GameFrame *currFrame = gameFrames->head->next;
+  while (currFrame != NULL) {
+    fprintf(fd, "%d %d %d\n", currFrame->noCols, currFrame->singleRow,
+            currFrame->turn);
+
+    for (int i = 0; i < currFrame->noCols; i++) {
+      fprintf(fd, "%d ", currFrame->board[0][i]);
+    }
+
+    if (!currFrame->singleRow) {
+      for (int i = 0; i < currFrame->noCols; i++) {
+        fprintf(fd, "%d ", currFrame->board[1][i]);
+      }
+    }
+
+    fprintf(fd, "\n\n");
+
+    currFrame = currFrame->next;
+  }
+
+  fclose(fd);
+}
+
+void readFromFile(void) {}

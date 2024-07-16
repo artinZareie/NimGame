@@ -2,79 +2,53 @@
   {
     "arguments": [
       "/usr/bin/cc",
-      "-I/home/artin/Documents/Projects/NimGame/headers",
-      "-c",
-      "-o",
-      "CMakeFiles/NimGame.dir/src/Constants.c.o",
-      "/home/artin/Documents/Projects/NimGame/src/Constants.c"
-    ],
-    "directory": "/home/artin/Documents/Projects/NimGame/build",
-    "file": "/home/artin/Documents/Projects/NimGame/src/Constants.c",
-    "output": "/home/artin/Documents/Projects/NimGame/build/CMakeFiles/NimGame.dir/src/Constants.c.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/cc",
-      "-I/home/artin/Documents/Projects/NimGame/headers",
-      "-c",
-      "-o",
-      "CMakeFiles/NimGame.dir/src/Game.c.o",
-      "/home/artin/Documents/Projects/NimGame/src/Game.c"
-    ],
-    "directory": "/home/artin/Documents/Projects/NimGame/build",
-    "file": "/home/artin/Documents/Projects/NimGame/src/Game.c",
-    "output": "/home/artin/Documents/Projects/NimGame/build/CMakeFiles/NimGame.dir/src/Game.c.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/cc",
-      "-I/home/artin/Documents/Projects/NimGame/headers",
-      "-c",
-      "-o",
-      "CMakeFiles/NimGame.dir/src/Utils.c.o",
-      "/home/artin/Documents/Projects/NimGame/src/Utils.c"
-    ],
-    "directory": "/home/artin/Documents/Projects/NimGame/build",
-    "file": "/home/artin/Documents/Projects/NimGame/src/Utils.c",
-    "output": "/home/artin/Documents/Projects/NimGame/build/CMakeFiles/NimGame.dir/src/Utils.c.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/cc",
-      "-I/home/artin/Documents/Projects/NimGame/headers",
+      "-I/home/aritn/Documents/Projects/uni/NimGameTerm/headers",
       "-c",
       "-o",
       "CMakeFiles/NimGame.dir/src/Screen.c.o",
-      "/home/artin/Documents/Projects/NimGame/src/Screen.c"
+      "/home/aritn/Documents/Projects/uni/NimGameTerm/src/Screen.c"
     ],
-    "directory": "/home/artin/Documents/Projects/NimGame/build",
-    "file": "/home/artin/Documents/Projects/NimGame/src/Screen.c",
-    "output": "/home/artin/Documents/Projects/NimGame/build/CMakeFiles/NimGame.dir/src/Screen.c.o"
+    "directory": "/home/aritn/Documents/Projects/uni/NimGameTerm/build",
+    "file": "/home/aritn/Documents/Projects/uni/NimGameTerm/src/Screen.c",
+    "output": "/home/aritn/Documents/Projects/uni/NimGameTerm/build/CMakeFiles/NimGame.dir/src/Screen.c.o"
   },
   {
     "arguments": [
       "/usr/bin/cc",
-      "-I/home/artin/Documents/Projects/NimGame/headers",
+      "-I/home/aritn/Documents/Projects/uni/NimGameTerm/headers",
       "-c",
       "-o",
       "CMakeFiles/NimGame.dir/src/Computer.c.o",
-      "/home/artin/Documents/Projects/NimGame/src/Computer.c"
+      "/home/aritn/Documents/Projects/uni/NimGameTerm/src/Computer.c"
     ],
-    "directory": "/home/artin/Documents/Projects/NimGame/build",
-    "file": "/home/artin/Documents/Projects/NimGame/src/Computer.c",
-    "output": "/home/artin/Documents/Projects/NimGame/build/CMakeFiles/NimGame.dir/src/Computer.c.o"
+    "directory": "/home/aritn/Documents/Projects/uni/NimGameTerm/build",
+    "file": "/home/aritn/Documents/Projects/uni/NimGameTerm/src/Computer.c",
+    "output": "/home/aritn/Documents/Projects/uni/NimGameTerm/build/CMakeFiles/NimGame.dir/src/Computer.c.o"
   },
   {
     "arguments": [
       "/usr/bin/cc",
-      "-I/home/artin/Documents/Projects/NimGame/headers",
+      "-I/home/aritn/Documents/Projects/uni/NimGameTerm/headers",
+      "-c",
+      "-o",
+      "CMakeFiles/NimGame.dir/src/Game.c.o",
+      "/home/aritn/Documents/Projects/uni/NimGameTerm/src/Game.c"
+    ],
+    "directory": "/home/aritn/Documents/Projects/uni/NimGameTerm/build",
+    "file": "/home/aritn/Documents/Projects/uni/NimGameTerm/src/Game.c",
+    "output": "/home/aritn/Documents/Projects/uni/NimGameTerm/build/CMakeFiles/NimGame.dir/src/Game.c.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-I/home/aritn/Documents/Projects/uni/NimGameTerm/headers",
       "-c",
       "-o",
       "CMakeFiles/NimGame.dir/src/main.c.o",
-      "/home/artin/Documents/Projects/NimGame/src/main.c"
+      "/home/aritn/Documents/Projects/uni/NimGameTerm/src/main.c"
     ],
-    "directory": "/home/artin/Documents/Projects/NimGame/build",
-    "file": "/home/artin/Documents/Projects/NimGame/src/main.c",
-    "output": "/home/artin/Documents/Projects/NimGame/build/CMakeFiles/NimGame.dir/src/main.c.o"
+    "directory": "/home/aritn/Documents/Projects/uni/NimGameTerm/build",
+    "file": "/home/aritn/Documents/Projects/uni/NimGameTerm/src/main.c",
+    "output": "/home/aritn/Documents/Projects/uni/NimGameTerm/build/CMakeFiles/NimGame.dir/src/main.c.o"
   }
 ]

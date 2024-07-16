@@ -53,3 +53,5 @@ enum ControlDirection HumanMoveSelector(const struct GameBoard *const board,
                                         int staged);
 enum ControlDirection ComputerMoveSelector(const struct GameBoard *const board,
                                            int staged);
+void saveGame(const struct FramesHistory *frames);
+void readFromFile(void);

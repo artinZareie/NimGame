@@ -1,4 +1,5 @@
 #include "Computer.h"
+#include "Constants.h"
 #include "Utils.h"
 
 int CalculateGraundy(const struct GameBoard *board, bool onlyFirst) {
@@ -11,6 +12,7 @@ int CalculateGraundy(const struct GameBoard *board, bool onlyFirst) {
       sum += board->board[1][i];
     }
 
+    sum %= MAX_DRAW + 1;
     xsum ^= sum;
   }
 
@@ -24,9 +26,11 @@ struct IntPair findOptimalPileStd(const struct GameBoard *board, int xsum) {
     int val = board->board[0][i];
     if (val == 0)
       continue;
+    int tval = val % (MAX_DRAW + 1);
 
-    for (int j = 0; j < val; j++) {
-      int t = (xsum ^ val) ^ j;
+    for (int j = max_int(0, val - MAX_DRAW); j < val; j++) {
+      int tj = j % (MAX_DRAW + 1);
+      int t = (xsum ^ tval) ^ tj;
 
       if (t == 0) {
         x.first = i;
@@ -72,9 +76,11 @@ struct IntPair findOptimalPileMisere(const struct GameBoard *board, int xsum) {
     int val = board->board[0][i];
     if (val == 0)
       continue;
+    int tval = val % (MAX_DRAW + 1);
 
-    for (int j = 0; j < val; j++) {
-      int t = (xsum ^ val) ^ j;
+    for (int j = max_int(0, val - MAX_DRAW); j < val; j++) {
+      int tj = j % (MAX_DRAW + 1);
+      int t = (xsum ^ tval) ^ tj;
 
       if (t == 0) {
         x.first = i;

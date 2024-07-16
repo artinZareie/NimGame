@@ -90,6 +90,9 @@ const int COL_BASE_WIDTH = 4;
 const int COL_HORIZONTAL_MARGIN = 2;
 const int COL_VERTICAL_MARGIN = 2;
 
+const int MAX_DRAW = 4;
+const int MAX_MEX = 10000;
+
 // For windows, clear command is not available, since I expect that graders and
 // professor are using window and I am developing this on linux, I put this
 // directive here.
